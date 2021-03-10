@@ -28,17 +28,20 @@ delete from Song where Id = 18;
 
 --Instrucions from chapter:
 
+
+--1. Query all entries in Genre table
 SELECT
     Label
     FROM Genre;
 
+-- 2. Query all entries in Artist table and order by artist name
 SELECT
     Id,
     ArtistName,
     YearEstablished
     FROM Artist
     ORDER BY ArtistName;
-
+-- 3. Query all the songs in the Song table and include artist name
 SELECT
     song.Title,
     artist.ArtistName
@@ -80,6 +83,12 @@ INSERT INTO Song (Title, SongLength, ReleaseDate, GenreId, ArtistId, AlbumId) VA
 --10. Select for the song titles, album title, and artist name 
 -- using LEFT JOIN and WHERE:
 
+select s.Title as SongTitle, al.Title as AlbumTitle, ar.ArtistName
+    from song s
+    left join Album al on s.AlbumId = al.Id
+    left join Artist ar on al.ArtistId = ar.Id
+    where ar.Id = 28;
+
 --11. Select and display how many songs exist on each album
 -- use COUNT() and GROUP BY
 
@@ -90,11 +99,23 @@ select count(s.id) as SongCount, al.Title as AlbumTitle, ar.ArtistName
 group by al.Title, ar.ArtistName
 
 
---12. 
+--12. SELECT to display how many songs exist for each artist
+-- use COUNT() and GROUP BY
 
---13. 
+select count(s.id) as SongCount, ar.ArtistName
+    from song s
+        left join Artist ar on s.ArtistId = ar.id
+group by  ar.ArtistName
 
---14. 
+
+--13. SELECT to display how many songs exist for each genre.
+
+select count (s.id) as SongCount, g.label as Genre
+    from song s
+        left join Genre g on s.GenreId = g.id
+group by g.Label
+
+--14. Query for the artists that have put out records on more than one record label
 
 select *
     from Artist ar JOIN ALbum al on ar.id = al.ArtistId
@@ -104,9 +125,15 @@ select count (distinct al.label), ar.ArtistName
 group by ar.ArtistName
     having count (distinct al.label) > 1
 
---15. 
+--15. Query for the ablum with the logest duration using MAX()
+select a.Title, a.AlbumLength
+    from Album a
+where AlbumLength = (
+    select max(a.AlbumLength)
+        from Album a
+);
 
---16. 
+--16. Query for the song with the longest duration
 
 select s.Title, s.SongLength
     from song s
@@ -115,4 +142,12 @@ where s.SongLength = (
         from song s
 );
 
---17. 
+--17. Modify previous query to display the title of the album
+
+select s.Title, s.SongLength, al.Title as Album
+    from song s
+    left join Album al on s.AlbumId = al.id
+where s.SongLength = (
+    select max(s.SongLength)
+        from song s
+);
